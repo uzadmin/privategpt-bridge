@@ -1,0 +1,14 @@
+# Binaries
+bridge
+privategpt-bridge
+*.exe
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
