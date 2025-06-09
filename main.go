@@ -60,9 +60,9 @@ func createAPIProxy() http.Handler {
 	// Кастомизируем прокси для лучшей работы
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		// Добавляем CORS заголовки к ответам PrivateGPT
-		resp.Header().Set("Access-Control-Allow-Origin", "*")
-		resp.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		resp.Header().Set("Access-Control-Expose-Headers", "Content-Length, Content-Type")
+		resp.Header.Set("Access-Control-Allow-Origin", "*")
+		resp.Header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		resp.Header.Set("Access-Control-Expose-Headers", "Content-Length, Content-Type")
 		return nil
 	}
 
