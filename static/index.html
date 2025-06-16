@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -360,6 +360,56 @@
             font-size: 0.95rem;
             line-height: 1.5;
             word-wrap: break-word;
+            transition: all 0.2s ease;
+        }
+
+        .message-content.streaming {
+            position: relative;
+        }
+
+        .message-content.streaming::after {
+            content: '▊';
+            color: #3b82f6;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .message-content p {
+            margin: 0 0 8px 0;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-content h2, .message-content h3, .message-content h4 {
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+
+        .message-content code {
+            background: rgba(0, 0, 0, 0.1) !important;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .message-content strong {
+            font-weight: 600;
+        }
+
+        .message-content em {
+            font-style: italic;
+        }
+
+        .message-content div[style*="margin"] {
+            line-height: 1.4;
         }
 
         .message.user .message-content {
@@ -599,7 +649,7 @@
         <div class="container">
             <div class="header">
                 <h1>🔒 PrivateGPT Bridge</h1>
-                <p>Advanced Document AI Interface</p>
+                <p>Продвинутый интерфейс для работы с документами</p>
                 <div :class="['status-indicator', status.online ? 'status-online' : 'status-offline']">
                     <div class="status-dot"></div>
                     {{ status.message }}
@@ -607,46 +657,46 @@
             </div>
 
             <div class="main-content">
-                <!-- Sidebar -->
+                <!-- Боковая панель -->
                 <div class="sidebar">
-                    <!-- Mode Selection -->
+                    <!-- Выбор режима -->
                     <div class="card">
-                        <h2>🎯 AI Mode</h2>
+                        <h2>🎯 Режим ИИ</h2>
                         <div class="mode-selector">
                             <div 
                                 :class="['mode-btn', { active: config.mode === 'rag' }]"
                                 @click="setMode('rag')"
                             >
                                 <div>RAG</div>
-                                <span class="mode-description">Document Q&A</span>
+                                <span class="mode-description">Вопросы по документам</span>
                             </div>
                             <div 
                                 :class="['mode-btn', { active: config.mode === 'search' }]"
                                 @click="setMode('search')"
                             >
-                                <div>Search</div>
-                                <span class="mode-description">Find in docs</span>
+                                <div>Поиск</div>
+                                <span class="mode-description">Поиск в документах</span>
                             </div>
                             <div 
                                 :class="['mode-btn', { active: config.mode === 'basic' }]"
                                 @click="setMode('basic')"
                             >
-                                <div>Basic</div>
-                                <span class="mode-description">General chat</span>
+                                <div>Базовый</div>
+                                <span class="mode-description">Обычный чат</span>
                             </div>
                             <div 
                                 :class="['mode-btn', { active: config.mode === 'summarize' }]"
                                 @click="setMode('summarize')"
                             >
-                                <div>Summarize</div>
-                                <span class="mode-description">Content summary</span>
+                                <div>Суммаризация</div>
+                                <span class="mode-description">Резюме контента</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- File Upload -->
+                    <!-- Загрузка файлов -->
                     <div class="card">
-                        <h2>📄 Documents</h2>
+                        <h2>📄 Документы</h2>
                         <div 
                             class="upload-area"
                             :class="{ dragover: isDragOver }"
@@ -657,7 +707,7 @@
                         >
                             <div class="upload-icon">📁</div>
                             <div class="upload-text">
-                                {{ uploading ? 'Uploading...' : 'Upload Files' }}
+                                {{ uploading ? 'Загрузка...' : 'Загрузить файлы' }}
                             </div>
                             <div class="upload-subtext">
                                 PDF, DOCX, TXT, MD, CSV...
@@ -679,32 +729,32 @@
 
                         <div v-if="debugMode && lastUploadError" 
                              style="background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 12px; margin: 12px 0; font-size: 0.85rem;">
-                            <strong>Last Upload Error:</strong><br>
+                            <strong>Последняя ошибка загрузки:</strong><br>
                             <pre style="white-space: pre-wrap; font-family: monospace; margin-top: 8px;">{{ lastUploadError }}</pre>
                         </div>
 
                         <div v-if="deletingAllFiles" class="delete-all-confirmation">
-                            <strong>⚠️ Deleting all documents...</strong><br>
-                            This may take a few moments. Please do not close the browser.
+                            <strong>⚠️ Удаление всех документов...</strong><br>
+                            Это может занять несколько минут. Пожалуйста, не закрывайте браузер.
                         </div>
 
                         <div v-if="processingFiles.size > 0" class="processing-files">
-                            <strong><span class="processing-indicator"></span>Processing Files:</strong><br>
+                            <strong><span class="processing-indicator"></span>Обработка файлов:</strong><br>
                             <div v-for="filename in Array.from(processingFiles)" :key="filename" style="margin-top: 4px;">
-                                📄 {{ filename }} <span style="color: #92400e;">(still processing...)</span>
+                                📄 {{ filename }} <span style="color: #92400e;">(обрабатывается...)</span>
                             </div>
                             <div style="margin-top: 8px; font-size: 0.8rem; color: #92400e;">
-                                Files will appear in the list once processing is complete.
+                                Файлы появятся в списке после завершения обработки.
                             </div>
                         </div>
 
-                        <!-- Files List -->
+                        <!-- Список файлов -->
                         <div v-if="files.length > 0">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <span style="font-size: 0.9rem; color: #6b7280;">
-                                    {{ files.length }} unique document(s)
+                                    {{ files.length }} уникальных документов
                                     <span v-if="processingFiles.size > 0" style="color: #f59e0b;">
-                                        + {{ processingFiles.size }} processing
+                                        + {{ processingFiles.size }} обрабатывается
                                     </span>
                                 </span>
                                 <div style="display: flex; gap: 8px;">
@@ -714,7 +764,7 @@
                                         @click="selectAllFiles"
                                         :disabled="config.selectedDocs.length === files.length"
                                     >
-                                        Select All
+                                        Выбрать все
                                     </button>
                                     <button 
                                         class="btn-small"
@@ -722,16 +772,16 @@
                                         @click="clearSelectedFiles"
                                         :disabled="config.selectedDocs.length === 0"
                                     >
-                                        Clear
+                                        Очистить
                                     </button>
                                     <button 
                                         class="btn-small"
                                         style="background: #fef2f2; color: #dc2626;"
                                         @click="deleteAllFiles"
                                         :disabled="deletingAllFiles || files.length === 0"
-                                        title="Delete all documents"
+                                        title="Удалить все документы"
                                     >
-                                        {{ deletingAllFiles ? 'Deleting...' : '🗑️ Delete All' }}
+                                        {{ deletingAllFiles ? 'Удаление...' : '🗑️ Удалить все' }}
                                     </button>
                                 </div>
                             </div>
@@ -762,7 +812,7 @@
                                             class="btn-small btn-delete"
                                             @click="deleteFile(file.doc_id)"
                                             :disabled="deletingFile === file.doc_id || deletingAllFiles"
-                                            title="Delete this document"
+                                            title="Удалить этот документ"
                                         >
                                             {{ deletingFile === file.doc_id ? '...' : '🗑️' }}
                                         </button>
@@ -771,28 +821,30 @@
                             </div>
                         </div>
                         <div v-else class="empty-state">
-                            No documents uploaded
+                            Документы не загружены
                         </div>
                     </div>
 
-                    <!-- Settings -->
+                    <!-- Настройки -->
                     <div class="card">
-                        <h2>⚙️ Settings</h2>
+                        <h2>⚙️ Настройки</h2>
                         <div class="settings-group">
-                            <label class="settings-label">Max Tokens</label>
+                            <label class="settings-label">Максимум токенов</label>
                             <input 
                                 type="number" 
                                 v-model.number="config.maxTokens"
+                                @input="updateMaxTokens"
                                 class="settings-input"
                                 min="1"
                                 max="4000"
                             >
                         </div>
                         <div class="settings-group">
-                            <label class="settings-label">Temperature</label>
+                            <label class="settings-label">Температура</label>
                             <input 
                                 type="range" 
                                 v-model.number="config.temperature"
+                                @input="updateTemperature"
                                 class="settings-input"
                                 min="0"
                                 max="1"
@@ -804,71 +856,80 @@
                         </div>
                         <div class="settings-group">
                             <label class="settings-label">
-                                <input type="checkbox" v-model="config.useContext" style="margin-right: 8px;">
-                                Use Document Context
+                                <input type="checkbox" v-model="config.useContext" @change="updateUseContext" style="margin-right: 8px;">
+                                Использовать контекст документов
                             </label>
                         </div>
                         
                         <div class="settings-group">
                             <label class="settings-label">
                                 <input type="checkbox" v-model="debugMode" style="margin-right: 8px;">
-                                Debug Mode (show API details)
+                                Режим отладки (показать детали API)
                             </label>
                         </div>
 
                         <div v-if="debugMode" class="settings-group">
                             <button 
                                 class="btn-small"
-                                style="background: #f0f9ff; color: #0369a1; width: 100%;"
+                                style="background: #f0f9ff; color: #0369a1; width: 100%; margin-bottom: 5px;"
                                 @click="testConnection"
                             >
-                                🔧 Test Connection
+                                🔧 Тест подключения
                             </button>
                         </div>
 
                         <div v-if="debugMode" class="settings-group">
                             <button 
                                 class="btn-small"
-                                style="background: #fef2f2; color: #dc2626; width: 100%;"
-                                @click="testDeleteAllAPI"
-                                title="Test delete all API (dry run)"
+                                style="background: #f0fdf4; color: #15803d; width: 100%; margin-bottom: 5px;"
+                                @click="debugSettings"
                             >
-                                🧪 Test Delete All API
+                                🔍 Показать текущие настройки
+                            </button>
+                        </div>
+
+                        <div v-if="debugMode" class="settings-group">
+                            <button 
+                                class="btn-small"
+                                style="background: #fef3cd; color: #92400e; width: 100%;"
+                                @click="testChatAPI"
+                            >
+                                🧪 Тест Chat API
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chat Area -->
+                <!-- Область чата -->
                 <div class="card">
-                    <h2>💬 Chat Interface</h2>
+                    <h2>💬 Интерфейс чата</h2>
                     
                     <div v-if="config.selectedDocs.length > 0" class="selected-files-info">
-                        📋 Working with {{ config.selectedDocs.length }} selected document(s)
+                        📋 Работаю с {{ config.selectedDocs.length }} выбранными документами
                     </div>
 
                     <div v-if="config.mode !== 'basic' && config.selectedDocs.length === 0 && files.length > 0" 
                          style="background: #fef3cd; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.9rem; color: #92400e;">
-                        ⚠️ {{ config.mode.toUpperCase() }} mode works best with selected documents. Please select files to analyze.
+                        ⚠️ Режим {{ config.mode.toUpperCase() }} работает лучше с выбранными документами. Пожалуйста, выберите файлы для анализа.
                     </div>
 
                     <div v-if="config.mode !== 'basic' && files.length === 0" 
                          style="background: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.9rem; color: #dc2626;">
-                        📄 {{ config.mode.toUpperCase() }} mode requires documents. Please upload files first.
+                        📄 Режим {{ config.mode.toUpperCase() }} требует документы. Пожалуйста, загрузите файлы сначала.
                     </div>
 
                     <div class="chat-container">
                         <div class="chat-header">
                             <div class="chat-mode-indicator">
-                                Mode: <strong>{{ config.mode.toUpperCase() }}</strong>
+                                Режим: <strong>{{ config.mode.toUpperCase() }}</strong>
                                 <span v-if="config.mode !== 'basic'">
-                                    {{ config.useContext ? '+ Context' : '- Context' }}
+                                    {{ config.useContext ? '+ Контекст' : '- Контекст' }}
                                     <span v-if="config.selectedDocs.length > 0">
-                                        ({{ config.selectedDocs.length }} docs)
+                                        ({{ config.selectedDocs.length }} док.)
                                     </span>
                                 </span>
                                 <span v-if="config.mode === 'basic'" style="color: #6b7280;">
-                                    (No documents used)
+                                    (Документы не используются)
                                 </span>
                             </div>
                             <button 
@@ -876,29 +937,31 @@
                                 @click="clearHistory"
                                 :disabled="messages.length === 0"
                             >
-                                🗑️ Clear History
+                                🗑️ Очистить историю
                             </button>
                         </div>
 
                         <div class="chat-messages" ref="chatMessages">
                             <div v-for="message in messages" :key="message.id" :class="['message', message.role]">
                                 <div class="message-avatar">
-                                    {{ message.role === 'user' ? 'U' : 'AI' }}
+                                    {{ message.role === 'user' ? 'П' : 'ИИ' }}
                                 </div>
                                 <div>
-                                    <div class="message-content">
-                                        {{ message.content }}
+                                    <div 
+                                        :class="['message-content', { streaming: message.streaming }]" 
+                                        v-html="formatContent(message.content)"
+                                    >
                                     </div>
                                     <div v-if="message.sources && message.sources.length > 0" class="message-sources">
-                                        📚 Sources: {{ message.sources.join(', ') }}
+                                        📚 Источники: {{ message.sources.join(', ') }}
                                     </div>
                                 </div>
                             </div>
                             
-                            <div v-if="isTyping" class="typing-indicator">
-                                <div class="message-avatar">AI</div>
+                            <div v-if="isTyping && !hasStreamingMessage" class="typing-indicator">
+                                <div class="message-avatar">ИИ</div>
                                 <div>
-                                    AI is processing
+                                    ИИ обрабатывает запрос
                                     <div class="typing-dots">
                                         <div class="typing-dot"></div>
                                         <div class="typing-dot"></div>
@@ -913,7 +976,7 @@
                                 <textarea 
                                     v-model="systemPrompt"
                                     class="system-prompt"
-                                    placeholder="System prompt (optional): Define AI behavior..."
+                                    placeholder="Системный промпт (необязательно): Определите поведение ИИ..."
                                 ></textarea>
                             </div>
 
@@ -921,7 +984,7 @@
                                 <textarea 
                                     v-model="currentMessage"
                                     class="chat-input"
-                                    placeholder="Ask questions about your documents or chat generally..."
+                                    placeholder="Задавайте вопросы о ваших документах или общайтесь..."
                                     @keydown.enter.exact="sendMessage"
                                     @keydown.enter.shift.prevent="currentMessage += '\n'"
                                     :disabled="isTyping"
@@ -931,7 +994,7 @@
                                     @click="sendMessage"
                                     :disabled="!currentMessage.trim() || isTyping"
                                 >
-                                    {{ isTyping ? 'Sending...' : 'Send' }}
+                                    {{ isTyping ? 'Отправка...' : 'Отправить' }}
                                 </button>
                             </div>
                         </div>
@@ -940,7 +1003,7 @@
             </div>
         </div>
 
-        <!-- Notification -->
+        <!-- Уведомление -->
         <div v-if="notification.show" :class="['notification', notification.type, { show: notification.show }]">
             {{ notification.message }}
         </div>
@@ -952,14 +1015,14 @@
         createApp({
             data() {
                 return {
-                    status: { online: false, message: 'Checking connection...' },
+                    status: { online: false, message: 'Проверка подключения...' },
                     uploading: false,
                     uploadProgress: 0,
                     isDragOver: false,
                     files: [],
                     deletingFile: null,
                     deletingAllFiles: false,
-                    processingFiles: new Set(), // Track files being processed
+                    processingFiles: new Set(),
                     messages: [],
                     currentMessage: '',
                     isTyping: false,
@@ -969,6 +1032,7 @@
                     config: {
                         mode: 'rag',
                         useContext: true,
+                        use_context: true, // Для совместимости с API
                         selectedDocs: [],
                         maxTokens: 2000,
                         temperature: 0.7
@@ -976,6 +1040,12 @@
                     debugMode: false,
                     lastUploadError: null
                 };
+            },
+            
+            computed: {
+                hasStreamingMessage() {
+                    return this.messages.some(message => message.streaming);
+                }
             },
             
             mounted() {
@@ -991,41 +1061,49 @@
                         const data = await response.json();
                         
                         if (data.status === 'ok' && data.privategpt_status) {
-                            this.status = { online: true, message: 'Connected to PrivateGPT' };
+                            this.status = { online: true, message: 'Подключен к PrivateGPT' };
                         } else {
-                            this.status = { online: false, message: 'PrivateGPT not available' };
+                            this.status = { online: false, message: 'PrivateGPT недоступен' };
                         }
                     } catch (error) {
-                        this.status = { online: false, message: 'Bridge server offline' };
+                        this.status = { online: false, message: 'Сервер-мост недоступен' };
                     }
                 },
 
                 setMode(mode) {
                     this.config.mode = mode;
                     
-                    // Auto-adjust settings based on mode with clear feedback
                     switch(mode) {
                         case 'basic':
+                            // В базовом режиме контекст всегда отключен
                             this.config.useContext = false;
-                            this.showNotification('Basic mode: Chat without documents', 'success');
+                            this.config.use_context = false;
+                            this.showNotification('Базовый режим: Чат без документов', 'success');
                             break;
                         case 'search':
-                            this.config.useContext = true;
-                            this.showNotification('Search mode: Find content in documents', 'success');
+                            // В остальных режимах используем настройку пользователя
+                            this.config.useContext = this.config.useContext !== false; // По умолчанию true если не было установлено
+                            this.config.use_context = this.config.useContext;
+                            this.showNotification('Режим поиска: Поиск контента в документах', 'success');
                             break;
                         case 'rag':
-                            this.config.useContext = true;
-                            this.showNotification('RAG mode: Q&A with document context', 'success');
+                            this.config.useContext = this.config.useContext !== false;
+                            this.config.use_context = this.config.useContext;
+                            this.showNotification('Режим RAG: Вопросы-ответы с контекстом документов', 'success');
                             break;
                         case 'summarize':
-                            this.config.useContext = true;
-                            this.showNotification('Summarize mode: Create content summaries', 'success');
+                            this.config.useContext = this.config.useContext !== false;
+                            this.config.use_context = this.config.useContext;
+                            this.showNotification('Режим суммаризации: Создание резюме контента', 'success');
                             break;
                     }
                     
-                    // Log for debugging
                     if (this.debugMode) {
-                        console.log('Mode switched to:', mode, 'useContext:', this.config.useContext);
+                        console.log('🔄 Режим переключен на:', mode);
+                        console.log('🔧 useContext (UI):', this.config.useContext);
+                        console.log('🔧 use_context (API):', this.config.use_context);
+                        console.log('🌡️ temperature:', this.config.temperature);
+                        console.log('🎛️ maxTokens:', this.config.maxTokens);
                     }
                 },
 
@@ -1037,26 +1115,25 @@
                             this.files = data.data || [];
                             
                             if (this.debugMode) {
-                                console.log('Files loaded:', this.files.length, 'files');
-                                console.log('Files data:', data);
+                                console.log('Файлы загружены:', this.files.length, 'файлов');
+                                console.log('Данные файлов:', data);
                             }
                             
-                            // Remove any selected docs that no longer exist
                             const existingDocIds = this.files.map(f => f.doc_id);
                             this.config.selectedDocs = this.config.selectedDocs.filter(id => 
                                 existingDocIds.includes(id)
                             );
                         } else {
                             const errorText = await response.text();
-                            console.error('Error loading files:', response.status, errorText);
+                            console.error('Ошибка загрузки файлов:', response.status, errorText);
                             if (this.debugMode) {
-                                this.showNotification(`Error loading files: ${errorText}`, 'error');
+                                this.showNotification(`Ошибка загрузки файлов: ${errorText}`, 'error');
                             }
                         }
                     } catch (error) {
-                        console.error('Error loading files:', error);
+                        console.error('Ошибка загрузки файлов:', error);
                         if (this.debugMode) {
-                            this.showNotification(`Error loading files: ${error.message}`, 'error');
+                            this.showNotification(`Ошибка загрузки файлов: ${error.message}`, 'error');
                         }
                     }
                 },
@@ -1083,7 +1160,7 @@
                 async uploadFiles(files) {
                     for (const file of files) {
                         if (file.size > 50 * 1024 * 1024) {
-                            this.showNotification(`File ${file.name} too large (max 50MB)`, 'error');
+                            this.showNotification(`Файл ${file.name} слишком большой (макс. 50МБ)`, 'error');
                             continue;
                         }
 
@@ -1094,18 +1171,17 @@
                 async uploadFile(file) {
                     this.uploading = true;
                     this.uploadProgress = 0;
-                    this.lastUploadError = null; // Clear previous error
+                    this.lastUploadError = null;
 
                     try {
                         const formData = new FormData();
                         formData.append('file', file);
 
-                        // Calculate expected upload time based on file size
                         const fileSizeMB = file.size / (1024 * 1024);
                         const expectedMinutes = 2 + Math.floor(fileSizeMB / 2);
                         
                         if (fileSizeMB > 10) {
-                            this.showNotification(`Large file detected (${fileSizeMB.toFixed(1)}MB). Expected processing time: ~${expectedMinutes} minutes`, 'success');
+                            this.showNotification(`Обнаружен большой файл (${fileSizeMB.toFixed(1)}МБ). Ожидаемое время обработки: ~${expectedMinutes} минут`, 'success');
                         }
 
                         const progressInterval = setInterval(() => {
@@ -1122,7 +1198,6 @@
                         clearInterval(progressInterval);
                         this.uploadProgress = 100;
 
-                        // Always try to parse JSON response
                         let result;
                         const contentType = response.headers.get('content-type');
                         
@@ -1130,47 +1205,40 @@
                             try {
                                 result = await response.json();
                             } catch (parseError) {
-                                console.error('Error parsing JSON response:', parseError);
-                                result = { error: 'Invalid response format' };
+                                console.error('Ошибка парсинга JSON ответа:', parseError);
+                                result = { error: 'Неверный формат ответа' };
                             }
                         } else {
-                            // Fallback for non-JSON response
                             const text = await response.text();
-                            result = { error: `Unexpected response: ${text}` };
+                            result = { error: `Неожиданный ответ: ${text}` };
                         }
 
                         if (this.debugMode) {
-                            console.log('Upload response status:', response.status);
-                            console.log('Upload response:', result);
+                            console.log('Статус ответа загрузки:', response.status);
+                            console.log('Ответ загрузки:', result);
                         }
 
-                        // Handle different response types
                         if (response.status === 202 && result.processing) {
-                            // File is still processing (timeout occurred)
                             this.showNotification(`${result.message}`, 'success');
-                            
-                            // Start periodic checking for the file
                             this.processingFiles.add(file.name);
                             this.startPeriodicFileCheck(file.name, expectedMinutes);
                             
                         } else if ((response.ok || response.status === 202) && result.success !== false) {
-                            // Success cases
-                            let message = result.message || `${file.name} uploaded successfully!`;
+                            let message = result.message || `${file.name} загружен успешно!`;
                             
                             if (result.status === 'completed') {
-                                message = `✅ ${file.name} processed successfully!`;
+                                message = `✅ ${file.name} обработан успешно!`;
                                 this.processingFiles.delete(file.name);
                             } else if (result.status === 'processing') {
-                                message = `⏳ ${file.name} is being processed...`;
+                                message = `⏳ ${file.name} обрабатывается...`;
                                 this.processingFiles.add(file.name);
                             }
                             
                             this.showNotification(message, 'success');
-                            await this.loadFiles(); // Reload file list
+                            await this.loadFiles();
                             
                         } else {
-                            // Error cases
-                            let errorMessage = 'Upload failed';
+                            let errorMessage = 'Загрузка не удалась';
                             
                             if (result.error) {
                                 errorMessage = result.error;
@@ -1179,7 +1247,7 @@
                             } else if (result.message) {
                                 errorMessage = result.message;
                             } else {
-                                errorMessage = `Upload failed with status ${response.status}`;
+                                errorMessage = `Загрузка не удалась со статусом ${response.status}`;
                             }
                             
                             const errorInfo = {
@@ -1191,12 +1259,12 @@
                             
                             this.lastUploadError = JSON.stringify(errorInfo, null, 2);
                             
-                            console.error('Upload error:', errorInfo);
-                            this.showNotification(`Upload failed: ${errorMessage}`, 'error');
+                            console.error('Ошибка загрузки:', errorInfo);
+                            this.showNotification(`Ошибка загрузки: ${errorMessage}`, 'error');
                         }
                     } catch (error) {
                         const errorInfo = {
-                            type: 'Network Error',
+                            type: 'Ошибка сети',
                             message: error.message,
                             file: file.name,
                             timestamp: new Date().toISOString()
@@ -1204,8 +1272,8 @@
                         
                         this.lastUploadError = JSON.stringify(errorInfo, null, 2);
                         
-                        console.error('Upload network error:', error);
-                        this.showNotification(`Upload error: ${error.message}`, 'error');
+                        console.error('Ошибка сети загрузки:', error);
+                        this.showNotification(`Ошибка загрузки: ${error.message}`, 'error');
                     } finally {
                         this.uploading = false;
                         setTimeout(() => { this.uploadProgress = 0; }, 1000);
@@ -1214,53 +1282,50 @@
 
                 startPeriodicFileCheck(filename, maxMinutes) {
                     let checkCount = 0;
-                    const maxChecks = maxMinutes * 2; // Check every 30 seconds
+                    const maxChecks = maxMinutes * 2;
                     
                     const checkInterval = setInterval(async () => {
                         checkCount++;
                         
                         if (this.debugMode) {
-                            console.log(`Checking for file ${filename}, attempt ${checkCount}/${maxChecks}`);
+                            console.log(`Проверка файла ${filename}, попытка ${checkCount}/${maxChecks}`);
                         }
                         
-                        // Check if file appeared in the list
                         await this.loadFiles();
                         const fileExists = this.files.some(f => this.getFileName(f) === filename);
                         
                         if (fileExists) {
                             clearInterval(checkInterval);
                             this.processingFiles.delete(filename);
-                            this.showNotification(`✅ ${filename} processing completed and file is now available!`, 'success');
+                            this.showNotification(`✅ Обработка ${filename} завершена и файл теперь доступен!`, 'success');
                             return;
                         }
                         
-                        // Show progress notifications
-                        if (checkCount % 4 === 0) { // Every 2 minutes
+                        if (checkCount % 4 === 0) {
                             const remainingMinutes = Math.max(0, maxMinutes - Math.floor(checkCount / 2));
-                            this.showNotification(`⏳ Still processing ${filename}... (Est. ${remainingMinutes}min remaining)`, 'success');
+                            this.showNotification(`⏳ Все еще обрабатывается ${filename}... (Осталось ~${remainingMinutes}мин)`, 'success');
                         }
                         
-                        // Stop checking after max time
                         if (checkCount >= maxChecks) {
                             clearInterval(checkInterval);
                             this.processingFiles.delete(filename);
-                            this.showNotification(`⚠️ Processing ${filename} is taking longer than expected. Check the file list manually.`, 'error');
+                            this.showNotification(`⚠️ Обработка ${filename} занимает больше времени чем ожидалось. Проверьте список файлов вручную.`, 'error');
                         }
-                    }, 30000); // Check every 30 seconds
+                    }, 30000);
                 },
 
                 selectAllFiles() {
                     this.config.selectedDocs = this.files.map(file => file.doc_id);
-                    this.showNotification(`Selected all ${this.files.length} documents`, 'success');
+                    this.showNotification(`Выбраны все ${this.files.length} документов`, 'success');
                 },
 
                 clearSelectedFiles() {
                     this.config.selectedDocs = [];
-                    this.showNotification('Cleared document selection', 'success');
+                    this.showNotification('Выбор документов очищен', 'success');
                 },
 
                 async deleteAllFiles() {
-                    if (!confirm(`Are you sure you want to delete ALL ${this.files.length} documents? This action cannot be undone.`)) {
+                    if (!confirm(`Вы уверены, что хотите удалить ВСЕ ${this.files.length} документов? Это действие нельзя отменить.`)) {
                         return;
                     }
 
@@ -1268,7 +1333,7 @@
                     
                     try {
                         if (this.debugMode) {
-                            console.log('Starting delete all files operation...');
+                            console.log('Начинаем операцию удаления всех файлов...');
                         }
 
                         const response = await fetch('/api/files/delete-all', {
@@ -1282,45 +1347,43 @@
                             } catch (parseError) {
                                 result = { 
                                     success: true, 
-                                    message: 'All files deleted successfully',
+                                    message: 'Все файлы удалены успешно',
                                     deleted_count: this.files.length,
                                     failed_count: 0 
                                 };
                             }
                             
                             if (this.debugMode) {
-                                console.log('Delete all response:', result);
+                                console.log('Ответ удаления всех:', result);
                             }
 
                             if (result.success) {
-                                let message = result.message || 'All files deleted successfully';
+                                let message = result.message || 'Все файлы удалены успешно';
                                 
                                 if (result.deleted_count !== undefined && result.failed_count !== undefined) {
-                                    message = `Deleted ${result.deleted_count} files`;
+                                    message = `Удалено ${result.deleted_count} файлов`;
                                     if (result.failed_count > 0) {
-                                        message += `, ${result.failed_count} failed`;
+                                        message += `, ${result.failed_count} не удалось`;
                                     }
                                 }
                                 
                                 this.showNotification(message, result.failed_count > 0 ? 'error' : 'success');
                                 
-                                // Show failed files if any
                                 if (result.failed_files && result.failed_files.length > 0) {
-                                    console.warn('Failed to delete files:', result.failed_files);
+                                    console.warn('Не удалось удалить файлы:', result.failed_files);
                                     setTimeout(() => {
-                                        this.showNotification(`Failed files: ${result.failed_files.join(', ')}`, 'error');
+                                        this.showNotification(`Не удалось удалить: ${result.failed_files.join(', ')}`, 'error');
                                     }, 2000);
                                 }
                             } else {
-                                this.showNotification('Delete all operation completed with errors', 'error');
+                                this.showNotification('Операция удаления всех завершена с ошибками', 'error');
                             }
                             
-                            // Reload file list and clear selection
                             await this.loadFiles();
                             this.config.selectedDocs = [];
                             
                         } else {
-                            let errorMessage = `Delete all failed with status ${response.status}`;
+                            let errorMessage = `Удаление всех не удалось со статусом ${response.status}`;
                             try {
                                 const result = await response.json();
                                 errorMessage = result.error || result.message || errorMessage;
@@ -1329,12 +1392,12 @@
                                 errorMessage = text || errorMessage;
                             }
                             
-                            console.error('Delete all error:', errorMessage);
-                            this.showNotification(`Delete all failed: ${errorMessage}`, 'error');
+                            console.error('Ошибка удаления всех:', errorMessage);
+                            this.showNotification(`Удаление всех не удалось: ${errorMessage}`, 'error');
                         }
                     } catch (error) {
-                        console.error('Delete all network error:', error);
-                        this.showNotification(`Delete all error: ${error.message}`, 'error');
+                        console.error('Ошибка сети удаления всех:', error);
+                        this.showNotification(`Ошибка удаления всех: ${error.message}`, 'error');
                     } finally {
                         this.deletingAllFiles = false;
                     }
@@ -1353,20 +1416,19 @@
                             try {
                                 result = await response.json();
                             } catch (parseError) {
-                                result = { message: 'File deleted successfully' };
+                                result = { message: 'Файл удален успешно' };
                             }
                             
-                            this.showNotification(result.message || 'File deleted successfully!', 'success');
+                            this.showNotification(result.message || 'Файл удален успешно!', 'success');
                             await this.loadFiles();
                             
-                            // Remove from selected docs
                             this.config.selectedDocs = this.config.selectedDocs.filter(id => id !== docId);
                             
                             if (this.debugMode) {
-                                console.log('File deleted:', docId);
+                                console.log('Файл удален:', docId);
                             }
                         } else {
-                            let errorMessage = `Delete failed with status ${response.status}`;
+                            let errorMessage = `Удаление не удалось со статусом ${response.status}`;
                             try {
                                 const result = await response.json();
                                 errorMessage = result.error || result.message || errorMessage;
@@ -1375,12 +1437,12 @@
                                 errorMessage = text || errorMessage;
                             }
                             
-                            console.error('Delete error:', errorMessage);
-                            this.showNotification(`Delete failed: ${errorMessage}`, 'error');
+                            console.error('Ошибка удаления:', errorMessage);
+                            this.showNotification(`Удаление не удалось: ${errorMessage}`, 'error');
                         }
                     } catch (error) {
-                        console.error('Delete network error:', error);
-                        this.showNotification(`Delete error: ${error.message}`, 'error');
+                        console.error('Ошибка сети удаления:', error);
+                        this.showNotification(`Ошибка удаления: ${error.message}`, 'error');
                     } finally {
                         this.deletingFile = null;
                     }
@@ -1402,17 +1464,47 @@
 
                     this.scrollToBottom();
 
+                    // Создаем сообщение ассистента для стриминга
+                    const assistantMessage = {
+                        id: this.messageId++,
+                        role: 'assistant',
+                        content: '',
+                        streaming: true,
+                        sources: []
+                    };
+                    this.messages.push(assistantMessage);
+
                     try {
+                        // Определяем use_context на основе режима и настроек пользователя
+                        let effectiveUseContext = this.config.useContext;
+                        
+                        // В basic режиме принудительно отключаем контекст
+                        if (this.config.mode === 'basic') {
+                            effectiveUseContext = false;
+                        }
+                        
+                        // Создаем правильный payload
                         const payload = {
                             message: message,
-                            config: this.config,
+                            config: {
+                                mode: this.config.mode,
+                                use_context: effectiveUseContext,
+                                selected_docs: this.config.selectedDocs,
+                                max_tokens: this.config.maxTokens,
+                                temperature: this.config.temperature
+                            },
                             system_prompt: this.systemPrompt,
-                            history: this.messages.slice(0, -1) // Exclude the current message
+                            history: this.messages.slice(0, -2) // Исключаем последние два сообщения (пользователя и пустое ассистента)
                         };
 
-                        // Log the payload for debugging
                         if (this.debugMode) {
-                            console.log('Sending payload:', JSON.stringify(payload, null, 2));
+                            console.log('🚀 Отправляем payload для режима', this.config.mode);
+                            console.log('🔧 use_context:', payload.config.use_context, '(effective)');
+                            console.log('🔧 useContext (UI):', this.config.useContext);
+                            console.log('🌡️ temperature:', payload.config.temperature, '(type:', typeof payload.config.temperature, ')');
+                            console.log('🎛️ max_tokens:', payload.config.max_tokens, '(type:', typeof payload.config.max_tokens, ')');
+                            console.log('📋 selected_docs:', payload.config.selected_docs);
+                            console.log('📝 Полный payload:', JSON.stringify(payload, null, 2));
                         }
 
                         const response = await fetch('/api/chat', {
@@ -1424,80 +1516,175 @@
                         });
 
                         if (response.ok) {
-                            const data = await response.json();
-                            if (this.debugMode) {
-                                console.log('Received response:', data);
-                            }
+                            const contentType = response.headers.get('content-type') || '';
                             
-                            let content = '';
-                            let sources = [];
-
-                            if (this.config.mode === 'search') {
-                                // Handle chunks response
-                                if (data.data && data.data.length > 0) {
-                                    content = data.data.map((chunk, index) => 
-                                        `**Result ${index + 1}:**\n${chunk.text}`
-                                    ).join('\n\n');
-                                    sources = data.data.map(chunk => 
-                                        chunk.document?.doc_metadata?.file_name || 'Unknown'
-                                    ).filter(Boolean);
-                                } else {
-                                    content = 'No relevant content found in documents.';
-                                }
+                            if (contentType.includes('text/event-stream')) {
+                                // Обрабатываем SSE поток
+                                await this.handleSSEStream(response, assistantMessage);
+                            } else if (contentType.includes('application/json')) {
+                                // Обрабатываем JSON ответ (fallback)
+                                const data = await response.json();
+                                await this.handleJSONResponse(data, assistantMessage);
                             } else {
-                                // Handle chat/completion response
-                                if (data.choices && data.choices[0]) {
-                                    content = data.choices[0].message?.content || data.choices[0].text || 'No response received';
-                                    
-                                    // Extract sources if available
-                                    if (data.choices[0].sources) {
-                                        sources = data.choices[0].sources.map(source => 
-                                            source.document?.doc_metadata?.file_name || 'Unknown'
-                                        );
-                                    }
-                                } else {
-                                    content = 'No response received';
-                                }
+                                // Неожиданный тип контента
+                                const text = await response.text();
+                                assistantMessage.content = `Неожиданный тип ответа: ${contentType}\n\n${text}`;
+                                assistantMessage.streaming = false;
                             }
-
-                            // Add mode indicator to response for debugging (only in debug mode)
-                            const modeIndicator = this.debugMode ? 
-                                (this.config.mode === 'basic' ? 
-                                    ' [Basic Mode - No Documents]' : 
-                                    ` [${this.config.mode.toUpperCase()} Mode]`) : '';
-
-                            const assistantMessage = {
-                                id: this.messageId++,
-                                role: 'assistant',
-                                content: content + modeIndicator,
-                                sources: sources.length > 0 ? [...new Set(sources)] : null
-                            };
-                            
-                            this.messages.push(assistantMessage);
                         } else {
                             const error = await response.text();
                             if (this.debugMode) {
-                                console.error('API Error:', error);
+                                console.error('❌ Ошибка API:', error);
                             }
-                            this.messages.push({
-                                id: this.messageId++,
-                                role: 'assistant',
-                                content: `Error: ${error}`
-                            });
+                            assistantMessage.content = `Ошибка: ${error}`;
+                            assistantMessage.streaming = false;
                         }
                     } catch (error) {
                         if (this.debugMode) {
-                            console.error('Network Error:', error);
+                            console.error('❌ Ошибка сети:', error);
                         }
-                        this.messages.push({
-                            id: this.messageId++,
-                            role: 'assistant',
-                            content: `Connection error: ${error.message}`
-                        });
+                        assistantMessage.content = `Ошибка подключения: ${error.message}`;
+                        assistantMessage.streaming = false;
                     } finally {
                         this.isTyping = false;
+                        assistantMessage.streaming = false;
                         this.scrollToBottom();
                     }
+                },
+
+                async handleSSEStream(response, assistantMessage) {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+                    let fullContent = '';
+                    let sources = new Set();
+
+                    try {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop() || '';
+
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    const data = line.slice(6).trim();
+                                    if (data === '[DONE]') {
+                                        assistantMessage.streaming = false;
+                                        return;
+                                    }
+                                    
+                                    if (data) {
+                                        try {
+                                            const parsed = JSON.parse(data);
+                                            
+                                            if (this.debugMode) {
+                                                console.log('📦 SSE chunk:', parsed);
+                                            }
+
+                                            // Обрабатываем разные форматы ответов
+                                            if (parsed.choices && parsed.choices[0]) {
+                                                const choice = parsed.choices[0];
+                                                
+                                                if (choice.delta && choice.delta.content) {
+                                                    // Streaming format
+                                                    fullContent += choice.delta.content;
+                                                    assistantMessage.content = fullContent;
+                                                } else if (choice.message && choice.message.content) {
+                                                    // Complete message format
+                                                    fullContent = choice.message.content;
+                                                    assistantMessage.content = fullContent;
+                                                } else if (choice.text) {
+                                                    // Text format
+                                                    fullContent += choice.text;
+                                                    assistantMessage.content = fullContent;
+                                                }
+
+                                                // Собираем источники
+                                                if (choice.sources) {
+                                                    choice.sources.forEach(source => {
+                                                        if (source.document?.doc_metadata?.file_name) {
+                                                            sources.add(source.document.doc_metadata.file_name);
+                                                        }
+                                                    });
+                                                }
+                                            } else if (parsed.data && Array.isArray(parsed.data)) {
+                                                // Search mode format
+                                                const searchResults = parsed.data.map((chunk, index) => 
+                                                    `**Результат ${index + 1}:**\n${chunk.text}`
+                                                ).join('\n\n');
+                                                
+                                                assistantMessage.content = searchResults;
+                                                
+                                                parsed.data.forEach(chunk => {
+                                                    if (chunk.document?.doc_metadata?.file_name) {
+                                                        sources.add(chunk.document.doc_metadata.file_name);
+                                                    }
+                                                });
+                                            }
+
+                                            this.scrollToBottom();
+                                        } catch (parseError) {
+                                            if (this.debugMode) {
+                                                console.warn('Не удалось распарсить SSE данные:', data, parseError);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } finally {
+                        reader.releaseLock();
+                        assistantMessage.sources = sources.size > 0 ? Array.from(sources) : null;
+                        
+                        // Добавляем индикатор режима только в debug режиме
+                        if (this.debugMode && assistantMessage.content) {
+                            assistantMessage.content += ` [${this.config.mode.toUpperCase()} | SSE stream]`;
+                        }
+                    }
+                },
+
+                async handleJSONResponse(data, assistantMessage) {
+                    if (this.debugMode) {
+                        console.log('✅ Получен JSON ответ для режима', this.config.mode);
+                        console.log('📨 Данные ответа:', data);
+                    }
+                    
+                    let content = '';
+                    let sources = [];
+
+                    if (this.config.mode === 'search') {
+                        if (data.data && data.data.length > 0) {
+                            content = data.data.map((chunk, index) => 
+                                `**Результат ${index + 1}:**\n${chunk.text}`
+                            ).join('\n\n');
+                            sources = data.data.map(chunk => 
+                                chunk.document?.doc_metadata?.file_name || 'Неизвестно'
+                            ).filter(Boolean);
+                        } else {
+                            content = 'Релевантный контент не найден в документах.';
+                        }
+                    } else {
+                        if (data.choices && data.choices[0]) {
+                            content = data.choices[0].message?.content || data.choices[0].text || 'Ответ не получен';
+                            
+                            if (data.choices[0].sources) {
+                                sources = data.choices[0].sources.map(source => 
+                                    source.document?.doc_metadata?.file_name || 'Неизвестно'
+                                );
+                            }
+                        } else {
+                            content = 'Ответ не получен';
+                        }
+                    }
+
+                    // Добавляем индикатор режима только в debug режиме
+                    const modeIndicator = this.debugMode ? ` [${this.config.mode.toUpperCase()} | JSON]` : '';
+
+                    assistantMessage.content = content + modeIndicator;
+                    assistantMessage.sources = sources.length > 0 ? [...new Set(sources)] : null;
                 },
 
                 async clearHistory() {
@@ -1508,10 +1695,10 @@
                         
                         if (response.ok) {
                             this.messages = [];
-                            this.showNotification('Chat history cleared!', 'success');
+                            this.showNotification('История чата очищена!', 'success');
                         }
                     } catch (error) {
-                        this.showNotification('Error clearing history', 'error');
+                        this.showNotification('Ошибка очистки истории', 'error');
                     }
                 },
 
@@ -1543,58 +1730,210 @@
                     });
                 },
 
-                async testConnection() {
+                async testChatAPI() {
                     try {
-                        console.log('Testing connection...');
+                        console.log('🧪 Тестируем Chat API...');
                         
-                        // Test bridge health
-                        const healthResponse = await fetch('/health');
-                        const healthData = await healthResponse.json();
-                        console.log('Health check:', healthData);
+                        const testPayload = {
+                            message: "Привет",
+                            config: {
+                                mode: 'basic',
+                                use_context: false,
+                                selected_docs: [],
+                                max_tokens: 50,
+                                temperature: 0.5
+                            },
+                            system_prompt: "",
+                            history: []
+                        };
                         
-                        // Test file list
-                        const filesResponse = await fetch('/api/files');
-                        const filesData = await filesResponse.json();
-                        console.log('Files API:', filesData);
+                        console.log('📤 Отправляем тестовый payload:', JSON.stringify(testPayload, null, 2));
                         
-                        // Test PrivateGPT directly through proxy
-                        const pgptResponse = await fetch('/v1/ingest/list');
-                        const pgptData = await pgptResponse.json();
-                        console.log('PrivateGPT direct:', pgptData);
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(testPayload)
+                        });
                         
-                        this.showNotification('Connection test completed - check console', 'success');
+                        console.log('📡 Статус ответа:', response.status, response.statusText);
+                        console.log('📋 Headers ответа:');
+                        for (const [key, value] of response.headers.entries()) {
+                            console.log(`  ${key}: ${value}`);
+                        }
+                        
+                        const contentType = response.headers.get('content-type') || 'unknown';
+                        console.log('🔍 Content-Type:', contentType);
+                        
+                        if (response.ok) {
+                            if (contentType.includes('text/event-stream')) {
+                                console.log('🌊 Сервер возвращает SSE поток');
+                                console.log('📄 Читаем первые несколько SSE событий...');
+                                
+                                const reader = response.body.getReader();
+                                const decoder = new TextDecoder();
+                                let buffer = '';
+                                let eventCount = 0;
+                                const maxEvents = 5;
+                                
+                                try {
+                                    while (eventCount < maxEvents) {
+                                        const { done, value } = await reader.read();
+                                        if (done) break;
+                                        
+                                        buffer += decoder.decode(value, { stream: true });
+                                        const lines = buffer.split('\n');
+                                        buffer = lines.pop() || '';
+                                        
+                                        for (const line of lines) {
+                                            if (line.startsWith('data: ')) {
+                                                const data = line.slice(6).trim();
+                                                if (data && data !== '[DONE]') {
+                                                    try {
+                                                        const parsed = JSON.parse(data);
+                                                        console.log(`📦 SSE событие ${++eventCount}:`, parsed);
+                                                        
+                                                        if (eventCount >= maxEvents) break;
+                                                    } catch (e) {
+                                                        console.log(`📄 Сырые SSE данные ${++eventCount}:`, data.substring(0, 100));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } finally {
+                                    reader.releaseLock();
+                                }
+                                
+                                this.showNotification('✅ SSE поток работает! Проверьте консоль', 'success');
+                                
+                            } else if (contentType.includes('application/json')) {
+                                try {
+                                    const data = await response.json();
+                                    console.log('✅ JSON ответ получен:', data);
+                                    this.showNotification('Тест Chat API успешен - проверьте консоль', 'success');
+                                } catch (jsonError) {
+                                    console.error('❌ Ошибка парсинга JSON:', jsonError);
+                                    this.showNotification('Chat API вернул некорректный JSON', 'error');
+                                }
+                            } else {
+                                const text = await response.text();
+                                console.log('📄 Текстовый ответ:', text.substring(0, 500));
+                                this.showNotification(`Chat API вернул ${contentType} - проверьте консоль`, 'error');
+                            }
+                        } else {
+                            const errorText = await response.text();
+                            console.error('❌ HTTP ошибка:', response.status, errorText);
+                            this.showNotification(`Chat API ошибка ${response.status} - проверьте консоль`, 'error');
+                        }
+                        
                     } catch (error) {
-                        console.error('Connection test failed:', error);
-                        this.showNotification(`Connection test failed: ${error.message}`, 'error');
+                        console.error('❌ Сетевая ошибка тестирования Chat API:', error);
+                        this.showNotification(`Сетевая ошибка: ${error.message}`, 'error');
                     }
                 },
 
-                async testDeleteAllAPI() {
+                async testConnection() {
                     try {
-                        console.log('Testing delete all API...');
+                        console.log('Тестируем подключение...');
                         
-                        // Just test the endpoint without actually deleting
-                        console.log('Files that would be deleted:', this.files.length);
-                        console.log('File list:', this.files.map(f => ({
-                            id: f.doc_id,
-                            name: this.getFileName(f)
-                        })));
+                        const healthResponse = await fetch('/health');
+                        const healthData = await healthResponse.json();
+                        console.log('Проверка здоровья:', healthData);
                         
-                        this.showNotification(`Would delete ${this.files.length} files - check console`, 'success');
+                        const filesResponse = await fetch('/api/files');
+                        const filesData = await filesResponse.json();
+                        console.log('API файлов:', filesData);
+                        
+                        const pgptResponse = await fetch('/v1/ingest/list');
+                        const pgptData = await pgptResponse.json();
+                        console.log('PrivateGPT напрямую:', pgptData);
+                        
+                        this.showNotification('Тест подключения завершен - проверьте консоль', 'success');
                     } catch (error) {
-                        console.error('Delete all test failed:', error);
-                        this.showNotification(`Delete all test failed: ${error.message}`, 'error');
+                        console.error('Тест подключения не удался:', error);
+                        this.showNotification(`Тест подключения не удался: ${error.message}`, 'error');
                     }
+                },
+
+                debugSettings() {
+                    console.log('🔍 === ТЕКУЩИЕ НАСТРОЙКИ ===');
+                    console.log('🎯 Режим:', this.config.mode);
+                    console.log('🔧 useContext (UI):', this.config.useContext);
+                    console.log('🔧 use_context (API):', this.config.use_context);
+                    console.log('🌡️ Температура (config):', this.config.temperature, '(type:', typeof this.config.temperature, ')');
+                    console.log('🎛️ Максимум токенов (config):', this.config.maxTokens, '(type:', typeof this.config.maxTokens, ')');
+                    
+                    const tempSlider = document.querySelector('input[type="range"]');
+                    const tokensInput = document.querySelector('input[type="number"]');
+                    const contextCheckbox = document.querySelector('input[type="checkbox"]');
+                    
+                    console.log('🌡️ Температура (HTML slider):', tempSlider ? tempSlider.value : 'not found', '(type:', typeof (tempSlider ? tempSlider.value : null), ')');
+                    console.log('🎛️ Токены (HTML input):', tokensInput ? tokensInput.value : 'not found', '(type:', typeof (tokensInput ? tokensInput.value : null), ')');
+                    console.log('🔧 Контекст (HTML checkbox):', contextCheckbox ? contextCheckbox.checked : 'not found');
+                    
+                    console.log('📋 Выбранные документы:', this.config.selectedDocs);
+                    console.log('📝 Системный промпт:', this.systemPrompt);
+                    console.log('🐛 Режим отладки:', this.debugMode);
+                    console.log('📄 Загруженные файлы:', this.files.length);
+                    console.log('💬 Сообщений в истории:', this.messages.length);
+                    console.log('🔄 === ПОЛНЫЙ CONFIG ===');
+                    console.log(JSON.stringify(this.config, null, 2));
+                    
+                    this.showNotification('Настройки выведены в консоль (F12)', 'success');
                 },
 
                 getFileName(file) {
-                    return file.doc_metadata?.file_name || 'Unknown file';
+                    return file.doc_metadata?.file_name || 'Неизвестный файл';
                 },
 
                 getFileType(file) {
                     const fileName = this.getFileName(file);
                     const ext = fileName.split('.').pop()?.toUpperCase();
-                    return ext || 'Unknown';
+                    return ext || 'Неизвестно';
+                },
+
+                updateMaxTokens() {
+                    if (this.debugMode) {
+                        console.log('🎛️ Обновлен maxTokens:', this.config.maxTokens);
+                    }
+                },
+
+                updateTemperature() {
+                    if (this.debugMode) {
+                        console.log('🌡️ Обновлена температура:', this.config.temperature);
+                    }
+                },
+
+                updateUseContext() {
+                    this.config.use_context = this.config.useContext;
+                    
+                    if (this.debugMode) {
+                        console.log('🔄 Обновлен useContext:', this.config.useContext, 'use_context:', this.config.use_context);
+                    }
+                },
+
+                formatContent(content) {
+                    if (!content) return '';
+                    
+                    let formatted = content
+                        .replace(/\n\n/g, '</p><p>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/`(.*?)`/g, '<code style="background: #f1f1f1; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
+                        .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="margin: 4px 0;"><strong>$1.</strong> $2</div>')
+                        .replace(/^[-•]\s+(.+)$/gm, '<div style="margin: 2px 0 2px 20px;">• $1</div>')
+                        .replace(/^### (.+)$/gm, '<h4 style="margin: 10px 0 5px 0; color: #2563eb;">$1</h4>')
+                        .replace(/^## (.+)$/gm, '<h3 style="margin: 12px 0 6px 0; color: #1e40af;">$1</h3>')
+                        .replace(/^# (.+)$/gm, '<h2 style="margin: 15px 0 8px 0; color: #1e3a8a;">$1</h2>');
+                    
+                    if (formatted && !formatted.startsWith('<')) {
+                        formatted = '<p>' + formatted + '</p>';
+                    }
+                    
+                    return formatted;
                 }
             }
         }).mount('#app');
